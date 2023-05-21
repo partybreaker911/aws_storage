@@ -20,4 +20,18 @@ class ProfileView(LoginRequiredMixin, View):
         return render(request, self.template_name, context)
 
     def post(self, request):
-        pass
+        user_profile = Profile.objects.get(user=request.user.id)
+        user_profile_form = ProfileForm(request.POST, instance=user_profile)
+        if user_profile_form.is_valid():
+            user_profile_form.save()
+            messages.success(request, _("Your user profile has been updated."))
+            return redirect("dashboard:dashboard")
+        else:
+            messages.error(request, _("There was an error updating your profile"))
+            return render(
+                request,
+                self.template_name,
+                {
+                    "user_profile_form": user_profile_form,
+                },
+            )
