@@ -76,7 +76,7 @@
                                   {% trans 'Upload' %}
                                 </a>
                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuUpload">
-                                  <li><a class="dropdown-item" href="">{% trans 'File' %}</a></li>
+                                  <li><a class="dropdown-item" href="{% url 'storage:file_upload' %}">{% trans 'File' %}</a></li>
                                 </ul>
                                 <a class="btn btn-primary dropdown-toggle" href="#" role="button" id="dropdownMenuCreate" data-bs-toggle="dropdown" aria-expanded="false">
                                     {% trans 'Create' %}

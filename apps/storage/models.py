@@ -72,7 +72,7 @@ class File(models.Model):
         related_name="user_files",
     )
     name = models.CharField(_("File name"), max_length=50)
-    file = models.FileField(_("File"), upload_to="media/files/")
+    file = models.FileField(_("File"), upload_to="files/")
     folder = models.ForeignKey(
         Folder,
         verbose_name=_("Folder"),
