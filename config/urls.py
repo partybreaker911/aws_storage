@@ -10,6 +10,7 @@ urlpatterns = [
     path(settings.ADMIN_URL, admin.site.urls),
     path("", include("apps.dashboard.urls")),
     path("", include("apps.accounts.urls")),
+    path("storage/", include("apps.storage.urls")),
     # User management
     path("accounts/", include("allauth.urls")),
     path("accounts/two-factor/", include("allauth_2fa.urls")),
