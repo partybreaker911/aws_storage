@@ -5,7 +5,7 @@ from django.http import HttpResponse, HttpRequest
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from apps.accounts.models import Profile, RSAKeyPair, UserGeoData
+from apps.accounts.models import Profile, RSAKeyPair, UserGeoData, UserSession
 from apps.accounts.forms import ProfileForm
 
 
@@ -115,3 +115,33 @@ class UserGeoDataView(LoginRequiredMixin, View):
             return render(request, self.template_name, context)
         except UserGeoData.DoesNotExist:
             return render(request, self.template_name)
+
+
+class UserSessionView(LoginRequiredMixin, View):
+    template_name = "accounts/user_session.html"
+
+    def get(self, request: HttpRequest) -> HttpResponse:
+        try:
+            user_sessions = UserSession.objects.filter(user=request.user)
+            session_ids = [
+                user_session.session.session_key for user_session in user_sessions
+            ]
+
+            context = {
+                "user_sessions": user_sessions,
+                "session_ids": session_ids,
+            }
+            return render(request, self.template_name, context)
+        except UserSession.DoesNotExist:
+            return render(request, self.template_name)
+
+    def post(self, request: HttpRequest) -> HttpResponse:
+        session_id = request.POST.get("session_id")
+        if session_id:
+            try:
+                session = UserSession.objects.get(session_id=session_id)
+                session.session.delete()
+                session.delete()
+            except UserSession.DoesNotExist:
+                pass
+        return redirect("accounts:sessions")

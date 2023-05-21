@@ -1,6 +1,7 @@
 import uuid
 
 from django.db import models
+from django.contrib.sessions.models import Session
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
 
@@ -43,7 +44,9 @@ class Profile(models.Model):
 
 
 class UserGeoData(models.Model):
-    id = models.UUIDField(_("ID"), primary_key=True, default=uuid.uuid4, unique=True)
+    id = models.UUIDField(
+        _("ID"), primary_key=True, default=uuid.uuid4, unique=True, editable=False
+    )
     user = models.OneToOneField(
         CustomUser, on_delete=models.CASCADE, related_name="user_geo_data"
     )
@@ -63,7 +66,9 @@ class UserGeoData(models.Model):
 
 
 class UserGeoDataHistory(models.Model):
-    id = models.UUIDField(_("ID"), primary_key=True, default=uuid.uuid4, unique=True)
+    id = models.UUIDField(
+        _("ID"), primary_key=True, default=uuid.uuid4, unique=True, editable=False
+    )
     user = models.ForeignKey(
         CustomUser,
         verbose_name=_("user"),
@@ -100,3 +105,21 @@ class RSAKeyPair(models.Model):
 
     def __str__(self) -> str:
         return f"{self.id}"
+
+
+class UserSession(models.Model):
+    id = models.UUIDField(
+        _("ID"), primary_key=True, default=uuid.uuid4, unique=True, editable=False
+    )
+    user = models.ForeignKey(
+        CustomUser, on_delete=models.CASCADE, related_name="user_sessions"
+    )
+    session = models.OneToOneField(Session, on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(_("Timestamp"), auto_now_add=True)
+
+    class Meta:
+        verbose_name = _("User Session")
+        verbose_name_plural = _("User Sessions")
+
+    def __str__(self) -> str:
+        return f"{self.user.email}"

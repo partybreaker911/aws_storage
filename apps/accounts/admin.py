@@ -8,6 +8,7 @@ from apps.accounts.models import (
     UserGeoData,
     RSAKeyPair,
     UserGeoDataHistory,
+    UserSession,
 )
 
 
@@ -26,3 +27,4 @@ admin.site.register(Profile)
 admin.site.register(UserGeoData)
 admin.site.register(RSAKeyPair)
 admin.site.register(UserGeoDataHistory)
+admin.site.register(UserSession)

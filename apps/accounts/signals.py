@@ -4,11 +4,18 @@ from ipware import get_client_ip
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.contrib.auth import get_user_model
+from django.contrib.sessions.models import Session
 
-from django.contrib.auth.signals import user_logged_in
+from allauth.account.signals import user_logged_in
 
 from apps.accounts.utils.generate_rsa_key import generate_rsa_keys
-from apps.accounts.models import Profile, UserGeoData, RSAKeyPair, UserGeoDataHistory
+from apps.accounts.models import (
+    Profile,
+    UserGeoData,
+    RSAKeyPair,
+    UserGeoDataHistory,
+    UserSession,
+)
 
 User = get_user_model()
 
@@ -38,21 +45,16 @@ def create_user_data(sender: Any, instance: User, created: bool, **kwargs: Any) 
         UserGeoData.objects.create(user=instance)
 
 
-@receiver(post_save, sender=user_logged_in)
-def update_user_geo_data(
-    sender: Any, instance: User, created: bool, **kwargs: Any
-) -> None:
+@receiver(user_logged_in)
+def update_user_geo_data(sender, user, request, **kwargs) -> None:
     """
     Updates the user's geo data upon login if it is a new user login.
     """
-    if created:
-        request = kwargs.get("request")
-        if request:
-            client_ip, is_routable = get_client_ip(request)
-        else:
-            client_ip = None
-        user_geo_data = UserGeoData.objects.create(user=instance, ip_address=client_ip)
-        user_geo_data.save()
+    if kwargs.get("created"):
+        client_ip, is_routable = get_client_ip(request)
+        UserGeoData.objects.create(user=user, ip_address=client_ip)
+    else:
+        client_ip = None
 
 
 @receiver(post_save, sender=UserGeoData)
@@ -72,3 +74,9 @@ def track_geodata_history(sender, instance, created, **kwargs):
             city=instance.city,
             country=instance.country,
         )
+
+
+@receiver(user_logged_in)
+def create_user_session(sender, request, user, **kwargs):
+    session = Session.objects.get(session_key=request.session.session_key)
+    UserSession.objects.create(user=user, session=session)
