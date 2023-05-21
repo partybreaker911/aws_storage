@@ -126,23 +126,23 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                <p class="font-bold ms-3 mb-0">{{ user_file.filename }}</p>
+                                                <p class="font-bold ms-3 mb-0"><a href="{{user_file.file.url}}" alt="{{user_file.file}}">{{ user_file.name }}</a></p>
                                             </td>
                                             <td class="col-auto">
-                                                <p class="mb-0">{{ user_file.file_size }} </p>
+                                                <p class="mb-0">{{ user_file.get_file_size }} </p>
                                             </td>
                                             <td class="col-auto">
                                                 <p class="mb-0">{{ user_file.timestamp }}</p>
                                             </td>
                                             <td>
-                                                <a href="{% url 'storage:file_detail' user_file.id %}" class="btn btn-primary">
+                                                <a href="" class="btn btn-primary">
                                                     <i class="">
                                                         {% trans "Detail" %}
                                                     </i>
                                                 </a>
                                             </td>
                                             <td>
-                                                <a href="{% url 'storage:file_delete' user_file.id %}" class="btn btn-warning">
+                                                <a href="" class="btn btn-warning">
                                                     <i class="">
                                                         {% trans "Delete" %}
                                                     </i>

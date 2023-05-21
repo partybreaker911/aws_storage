@@ -8,7 +8,7 @@ from django.utils.translation import gettext_lazy as _
 User = get_user_model()
 
 
-def get_file_size(file):
+def file_size(file):
     """
     Get the size of a file in a human-readable format.
 
@@ -88,6 +88,10 @@ class File(models.Model):
 
     def __str__(self) -> str:
         return f"{self.name}"
+
+    @property
+    def get_file_size(self):
+        return f"{file_size(self.file)}"
 
 
 class FileSignature(models.Model):
