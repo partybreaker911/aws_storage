@@ -2,7 +2,14 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
 from apps.accounts.forms import CustomUserChangeForm, CustomUserCreationForm
-from apps.accounts.models import CustomUser
+from apps.accounts.models import (
+    CustomUser,
+    Profile,
+    UserGeoData,
+    RSAKeyPair,
+    UserGeoDataHistory,
+    UserSession,
+)
 
 
 class CustomUserAdmin(UserAdmin):
@@ -16,3 +23,8 @@ class CustomUserAdmin(UserAdmin):
 
 
 admin.site.register(CustomUser, CustomUserAdmin)
+admin.site.register(Profile)
+admin.site.register(UserGeoData)
+admin.site.register(RSAKeyPair)
+admin.site.register(UserGeoDataHistory)
+admin.site.register(UserSession)

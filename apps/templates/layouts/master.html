@@ -113,12 +113,32 @@
                 <div class="collapse navbar-collapse" id="navbarColor01">
                   <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                      <a class="nav-link active" href="{% url 'dashboard:home' %}">{% trans "Home" %}
+                      <a class="nav-link active" href="{% url 'dashboard:dashboard' %}"><i class="bi bi-house-gear"></i>
+                        {% trans "Home" %}
                         <span class="visually-hidden">(current)</span>
                       </a>
                     </li>
                   </ul>
-                  <a href="{% url 'account_logout' %}" class="d-flex nav-link">{% trans "Logout" %}</a>
+                  <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navDropdown" role="button"  data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-bookmark-plus"></i>
+                        {% trans 'Account actions' %}
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" href="{% url 'accounts:profile' %}"><i class="bi bi-person-circle"></i>
+                            {% trans 'Profile' %}</a></li>
+                        <li><a class="dropdown-item" href="{% url 'two-factor-setup' %}"><i class="bi bi-gear"></i>
+                        {% trans 'Setup 2FA' %}</a></li>
+                        <li><a class="dropdown-item" href="{% url 'accounts:sessions' %}"><i class="bi bi-ethernet"></i>
+                            {% trans 'Open sessions' %}</a></li>
+                        <li><a class="dropdown-item" href="{% url 'accounts:geo_data' %}"><i class="bi bi-globe-central-south-asia"></i>
+                            {% trans 'Last login from' %}</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{% url 'account_logout' %}">
+                            <i class="bi bi-box-arrow-in-left"></i>
+                            {% trans 'Log out' %}</a></li>
+                    </ul>
+                  </li>
                 </div>
               </div>
         </nav>

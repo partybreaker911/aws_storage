@@ -1,0 +1,54 @@
+{% extends 'layouts/master.html' %}
+
+{% load i18n %}
+
+
+{% block content %}
+<div class="page-heading">
+    <div class="page-title">
+        <div class="row">
+            <div class="col-12 col-md-6 order-md-1 order-last">
+                <h3>{% trans 'RSA page' %}</h3>
+                <p class="text-subtitle text-muted">{% trans 'RSA page info' %}</p>
+            </div>
+            <div class="col-12 col-md-6 order-md-2 order-first">
+                <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'dashboard:dashboard' %}">{% trans 'Dashboard' %}</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">{% trans 'RSA key' %}</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="page-content">
+    <section class="row">
+        <div class="col-12 col-lg-12">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="text-center">{% trans 'RSA USER KEY' %}</h4>
+                        </div>
+                        <div class="card-body">                           
+                            <div id="chart-profile-visit"></div>
+                                <td colspan="5" class="col-auto">
+                                    <p class="mb-0 text-center"></p>
+                                    <div x-data="{show: false}" class="mb-0 text-center">
+                                        <button class="btn btn-primary mb-4" @click="show = !show">
+                                            <i class="bi bi-file-lock2">
+                                            {% trans "Show public key" %}
+                                            </i>
+                                        </button>
+                                        <pre id="public-key" x-show="show" x-transition.opacity><p class="mb-0 text-center"><small class="text-muted">{{ keys_pair.public_key }}</small></p></pre>                                                                               
+                                    </div>
+                                </td>                              
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock content %}
