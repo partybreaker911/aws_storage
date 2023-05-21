@@ -5,8 +5,10 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.contrib.auth import get_user_model
 
-from apps.accounts.models import Profile, UserGeoData, RSAKeyPair, UserGeoDataHistory
+from django.contrib.auth.signals import user_logged_in
+
 from apps.accounts.utils.generate_rsa_key import generate_rsa_keys
+from apps.accounts.models import Profile, UserGeoData, RSAKeyPair, UserGeoDataHistory
 
 User = get_user_model()
 
@@ -33,6 +35,17 @@ def create_user_data(sender: Any, instance: User, created: bool, **kwargs: Any) 
             public_key=public_key,
             private_key=private_key,
         )
+        UserGeoData.objects.create(user=instance)
+
+
+@receiver(post_save, sender=user_logged_in)
+def update_user_geo_data(
+    sender: Any, instance: User, created: bool, **kwargs: Any
+) -> None:
+    """
+    Updates the user's geo data upon login if it is a new user login.
+    """
+    if created:
         request = kwargs.get("request")
         if request:
             client_ip, is_routable = get_client_ip(request)
@@ -44,6 +57,14 @@ def create_user_data(sender: Any, instance: User, created: bool, **kwargs: Any) 
 
 @receiver(post_save, sender=UserGeoData)
 def track_geodata_history(sender, instance, created, **kwargs):
+    """
+    Signal receiver function that tracks the history of UserGeoData objects.
+    :param sender: The model class of the object that sent the signal.
+    :param instance: The actual instance of UserGeoData that was just saved.
+    :param created: A boolean indicating whether the object was just created.
+    :param **kwargs: Any additional keyword arguments passed to the signal.
+    :return: None
+    """
     if created:
         UserGeoDataHistory.objects.create(
             user=instance.user,
