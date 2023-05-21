@@ -25,7 +25,9 @@ class Profile(models.Model):
     id = models.UUIDField(
         _("ID"), primary_key=True, default=uuid.uuid4, unique=True, editable=False
     )
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    user = models.OneToOneField(
+        CustomUser, on_delete=models.CASCADE, related_name="user_profile"
+    )
     first_name = models.CharField(_("First Name"), max_length=50)
     last_name = models.CharField(_("Last Name"), max_length=50)
     middle_name = models.CharField(_("Middle Name"), max_length=50, blank=True)
@@ -42,7 +44,9 @@ class Profile(models.Model):
 
 class UserGeoData(models.Model):
     id = models.UUIDField(_("ID"), primary_key=True, default=uuid.uuid4, unique=True)
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    user = models.OneToOneField(
+        CustomUser, on_delete=models.CASCADE, related_name="user_geo_data"
+    )
     ip_address = models.GenericIPAddressField(_("IP"), blank=True, null=True)
     city = models.CharField(_("City"), max_length=50, blank=True)
     country = models.CharField(_("Country"), max_length=50, blank=True)
@@ -59,7 +63,9 @@ class RSAKeyPair(models.Model):
     id = models.UUIDField(
         _("ID"), primary_key=True, default=uuid.uuid4, unique=True, editable=False
     )
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    user = models.OneToOneField(
+        CustomUser, on_delete=models.CASCADE, related_name="rsa_key_pair"
+    )
     public_key = models.TextField(_("Public Key"))
     private_key = models.TextField(_("Private Key"))
     timestamp = models.DateTimeField(_("Timestamp"), auto_now_add=True)
