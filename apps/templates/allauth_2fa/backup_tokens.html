@@ -1,0 +1,65 @@
+{% extends "layouts/master.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="page-heading">
+  <div class="page-title">
+      <div class="row">
+          <div class="col-12 col-md-6 order-md-1 order-last">
+              <h3>{% trans 'Tokens page' %}</h3>
+              <p class="text-subtitle text-muted">{% trans 'Tokens page' %}</p>
+          </div>
+          <div class="col-12 col-md-6 order-md-2 order-first">
+              <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                  <ol class="breadcrumb">
+                      <li class="breadcrumb-item"><a href="{% url 'dashboard:home' %}">{% trans 'Dashboard' %}</a></li>
+                      <li class="breadcrumb-item active" aria-current="page">{% trans 'GA token' %}</li>
+                  </ol>
+              </nav>
+          </div>
+      </div>
+  </div>
+</div>
+<div class="page-content">
+  <section class="row">
+    <div class="col-12 col-lg-12">
+      <div class="row">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+              <h4 class="card-title">{% trans "Two-Factor Authentication Backup Tokens" %}</h4> 
+            </div>
+            <div class="card-body">
+              {% if backup_tokens %}
+              {% if reveal_tokens %}
+                <ul>
+                  {% for token in backup_tokens %}
+                    <h5 class="text-center"><small class="text-muted">{{ token.token }}</h5></small>
+                  {% endfor %}
+                </ul>
+              {% else %}
+                <h5 class="text-center"><small class="text-muted">{% trans 'Backup tokens have been generated, but are not revealed here for security reasons. Press the button below to generate new ones.' %}</small></h5>
+              {% endif %}
+                {% else %}
+                  <h5 class="text-center"><small class="text-muted">{% trans 'No tokens. Press the button below to generate some.' %}</h5></small>
+                {% endif %}
+                <form method="post" class="form form-horizontal">
+                  {% csrf_token %}
+                <div class="text-center">
+                  <button type="submit" class="btn btn-primary">
+                    {% trans 'Generate backup tokens' %}
+                  </button>
+                </div>
+              </form>
+              <h5 class="text-center">{% trans "Or" %}</h5>
+              <div class="text-center">
+                <a href="{% url 'two-factor-remove' %}">{% trans "Disable Two Factor" %}</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock %}

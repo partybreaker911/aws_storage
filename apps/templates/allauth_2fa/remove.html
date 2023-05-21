@@ -1,0 +1,48 @@
+{% extends "layouts/master.html" %}
+{% load i18n crispy_forms_tags %}
+
+{% block content %}
+<div class="page-heading">
+  <div class="page-title">
+      <div class="row">
+          <div class="col-12 col-md-6 order-md-1 order-last">
+              <h3>{% trans 'Remove 2FA page' %}</h3>
+              <p class="text-subtitle text-muted">{% trans 'Remove 2FA' %}</p>
+          </div>
+          <div class="col-12 col-md-6 order-md-2 order-first">
+              <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                  <ol class="breadcrumb">
+                      <li class="breadcrumb-item"><a href="{% url 'dashboard:home' %}">{% trans 'Dashboard' %}</a></li>
+                      <li class="breadcrumb-item active" aria-current="page">{% trans 'Remove 2FA' %}</li>
+                  </ol>
+              </nav>
+          </div>
+      </div>
+  </div>
+</div>
+<div class="page-content">
+  <section class="row">
+    <div class="col-12 col-lg-12">
+      <div class="row">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+              <h4 class="card-title">{% trans "Disable Two-Factor Authentication" %}</h4>
+            </div>
+            <div class="card-body">
+              <h5 class="text-center"><small class="text-muted">{% trans "Please enter a valid authentication token to disable two-factor authentication:" %}</small></h5>
+              <form method="post" class="form form-horizontal">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <button type="submit" class="btn btn-primary">
+                  {% trans 'Disable Two-Factor' %}
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock %}
