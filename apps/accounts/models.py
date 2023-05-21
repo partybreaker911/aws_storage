@@ -50,10 +50,34 @@ class UserGeoData(models.Model):
     ip_address = models.GenericIPAddressField(_("IP"), blank=True, null=True)
     city = models.CharField(_("City"), max_length=50, blank=True)
     country = models.CharField(_("Country"), max_length=50, blank=True)
+    timestamp = models.DateTimeField(
+        _("Timestamp"), auto_now_add=True, blank=True, null=True
+    )
 
     class Meta:
         verbose_name = _("User Geo Data")
         verbose_name_plural = _("User Geo Data")
+
+    def __str__(self) -> str:
+        return f"{self.user}"
+
+
+class UserGeoDataHistory(models.Model):
+    id = models.UUIDField(_("ID"), primary_key=True, default=uuid.uuid4, unique=True)
+    user = models.ForeignKey(
+        CustomUser,
+        verbose_name=_("user"),
+        on_delete=models.CASCADE,
+        related_name="user_geo_data_history",
+    )
+    ip_address = models.GenericIPAddressField(_("IP"), blank=True, null=True)
+    city = models.CharField(_("City"), max_length=50, blank=True)
+    country = models.CharField(_("Country"), max_length=50, blank=True)
+    timestamp = models.DateTimeField(_("Timestamp"), auto_now_add=True)
+
+    class Meta:
+        verbose_name = _("User Geo Data History")
+        verbose_name_plural = _("User Geo Data History")
 
     def __str__(self) -> str:
         return f"{self.user}"

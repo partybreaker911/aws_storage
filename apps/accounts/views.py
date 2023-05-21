@@ -5,8 +5,7 @@ from django.http import HttpResponse, HttpRequest
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-
-from apps.accounts.models import Profile, RSAKeyPair
+from apps.accounts.models import Profile, RSAKeyPair, UserGeoData
 from apps.accounts.forms import ProfileForm
 
 
@@ -76,8 +75,11 @@ class RSKeyPairView(LoginRequiredMixin, View):
         try:
             # Get the RSA key pair associated with the user.
             keys_pair = RSAKeyPair.objects.get(user=request.user)
+            context = {
+                "keys_pair": keys_pair,
+            }
             # Render the template with the key pair.
-            return render(request, self.template_name, {"keys_pair": keys_pair})
+            return render(request, self.template_name, context)
         except RSAKeyPair.DoesNotExist:
             # If the key pair does not exist, show an error message.
             messages.error(request, _("You do not have a keys pair"))
@@ -90,3 +92,26 @@ class RSKeyPairSSHKeyRefreshView(LoginRequiredMixin, View):
 
     def post(self, request: HttpRequest) -> HttpResponse:
         return render(request, self.template_name)
+
+
+class UserGeoDataView(LoginRequiredMixin, View):
+    template_name = "accounts/geo_data.html"
+
+    def get(self, request: HttpRequest) -> HttpResponse:
+        """
+        Renders the user's geographical data if available, or the default template if not.
+
+        Args:
+            request: The HTTP request object.
+
+        Returns:
+            An HTTP response object.
+        """
+        try:
+            user_geo_data = UserGeoData.objects.get(user=request.user)
+            context = {
+                "user_geo_data": user_geo_data,
+            }
+            return render(request, self.template_name, context)
+        except UserGeoData.DoesNotExist:
+            return render(request, self.template_name)

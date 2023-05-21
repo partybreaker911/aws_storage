@@ -5,7 +5,7 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.contrib.auth import get_user_model
 
-from apps.accounts.models import Profile, UserGeoData, RSAKeyPair
+from apps.accounts.models import Profile, UserGeoData, RSAKeyPair, UserGeoDataHistory
 from apps.accounts.utils.generate_rsa_key import generate_rsa_keys
 
 User = get_user_model()
@@ -40,3 +40,14 @@ def create_user_data(sender: Any, instance: User, created: bool, **kwargs: Any) 
             client_ip = None
         user_geo_data = UserGeoData.objects.create(user=instance, ip_address=client_ip)
         user_geo_data.save()
+
+
+@receiver(post_save, sender=UserGeoData)
+def track_geodata_history(sender, instance, created, **kwargs):
+    if created:
+        UserGeoDataHistory.objects.create(
+            user=instance.user,
+            ip_address=instance.ip_address,
+            city=instance.city,
+            country=instance.country,
+        )
