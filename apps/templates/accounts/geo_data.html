@@ -32,8 +32,8 @@
                             <h4 class="text-center">{% trans 'Last logins with geo data' %}</h4>
                         </div>
                         <div class="card-body">                           
-                            <div class="table">
-                                <table class="table">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
                                     <thead>
                                         <tr>
                                             <th>{% trans 'IP' %}</th>
@@ -50,8 +50,6 @@
                                             <td>{{ user_geo_data.country }}</td>
                                             <td>{{ user_geo_data.city }}</td>
                                             <td>{{ user_geo_data.timestamp }}</td>
-                                            <td><button class="btn btn-warning">
-                                                {% trans 'End Session' %}</i></button></td>
                                         </tr>
 
                                     </tbody>
