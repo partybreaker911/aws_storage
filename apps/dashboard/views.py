@@ -12,8 +12,10 @@ class DashboardView(LoginRequiredMixin, View):
         user = request.user
         files_for_user = DashboardService.get_files_for_user(user)
         count_files_for_user = DashboardService.count_files(user)
+        key_pair_for_user = DashboardService.get_keys_for_user(user)
         context = {
             "files_for_user": files_for_user,
             "count_files_for_user": count_files_for_user,
+            "key_pair_for_user": key_pair_for_user,
         }
         return render(request, self.template_name, context)

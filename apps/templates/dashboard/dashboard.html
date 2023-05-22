@@ -198,7 +198,7 @@
 
                     <div class="recent-message d-flex px-4 py-3">
                         <div class="name ms-4">
-                            <a href="">{{ key_pair_for_user }}</a>
+                            <a href="{% url 'accounts:keys' %}">{{ key_pair_for_user.user.email }}</a>
                         </div>   
                     </div>
 
