@@ -21,6 +21,7 @@ License: MIT
 
         $ docker-compose -f production.yml build && docker-compose -f production.yml up
 - If something gone wrong
+
         $ docker-compose -f local.yml run django python manage.py migrate
 
 
