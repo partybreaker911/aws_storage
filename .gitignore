@@ -1,4 +1,5 @@
 .vscode
+.envs
 Pipfile
 Pipfile.lock
 apps/media/files/*.*

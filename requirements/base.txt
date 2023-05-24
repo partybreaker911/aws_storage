@@ -28,6 +28,7 @@ django-htmx #https://django-htmx.readthedocs.io/en/latest/installation.html
 django-ipware==5.0.0 # https://github.com/un33k/django-ipware
 # Django REST Framework
 # Django phone number extension
+python-telegram-bot==20.2
 phonenumbers==8.13.8
 rsa==4.9
 cryptography
