@@ -13,6 +13,9 @@ License: MIT
 ## Basic Commands
 
 ### Run project
+
+Rename .envs_example to .envs
+
 - If you run locally
 
         $ docker-compose -f local.yml build && docker-compose -f local.yml up
