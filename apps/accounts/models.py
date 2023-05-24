@@ -111,13 +111,31 @@ class RSAKeyPair(models.Model):
         return f"{self.id}"
 
     @property
-    def get_public_key(self):
+    def get_public_key(self) -> serialization.PublicKey:
+        """
+        Returns the public key of the current instance as a `serialization.PublicKey` object.
+
+        Args:
+            self: The current instance.
+
+        Returns:
+            A `serialization.PublicKey` object representing the public key of the current instance.
+        """
         return serialization.load_pem_public_key(
             self.public_key.encode(), backend=default_backend()
         )
 
     @property
-    def get_private_key(self):
+    def get_private_key(self) -> serialization.RSAPrivateKey:
+        """
+        Return the private key as a RSAPrivateKey object.
+
+        Args:
+            self (object): The current instance of the class.
+
+        Returns:
+            RSAPrivateKey: The private key as a RSAPrivateKey object.
+        """
         return serialization.load_pem_private_key(
             self.private_key.encode(), password=None, backend=default_backend()
         )
