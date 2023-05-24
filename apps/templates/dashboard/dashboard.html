@@ -136,15 +136,15 @@
                                             </td>
                                             <td>
                                                 <a href="" class="btn btn-primary">
-                                                    <i class="">
+                                                    <i class="{% url 'storage:file_detail' user_file.id %}">
                                                         {% trans "Detail" %}
                                                     </i>
                                                 </a>
                                             </td>
                                             <td>
                                                 <a href="" class="btn btn-warning">
-                                                    <i class="">
-                                                        {% trans "Delete" %}
+                                                    <i class="{% url 'storage:file_share' user_file.id %}">
+                                                        {% trans "Share" %}
                                                     </i>
                                                 </a>
                                             </td>

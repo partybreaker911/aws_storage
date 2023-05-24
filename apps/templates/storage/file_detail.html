@@ -1,0 +1,39 @@
+{% extends 'layouts/master.html' %}
+
+{% load i18n %}
+
+
+{% block content %}
+<div class="page-heading">
+    <div class="page-title">
+        <div class="row">
+            <div class="col-12 col-md-6 order-md-1 order-last">
+                <h3>{% trans 'File detail' %}</h3>
+                <p class="text-subtitle text-muted">{% trans 'File detail page' %}</p>
+            </div>
+            <div class="col-12 col-md-6 order-md-2 order-first">
+                <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'dashboard:dashboard' %}">{% trans 'Dashboard' %}</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">{% trans 'File detail' %}</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="page-content">
+    <div class="card">
+        <div class="card-header">
+            <h5 class="text-center">{% trans 'File detail' %} {{ file.name }}</h5>
+        </div>
+        <div class="card-body">
+            <p>{{ file.name }}</p>
+            <p>{{ file.get_file_size }}</p>
+            <p>{{ file.timestamp }}</p>
+            <a href="{% url 'storage:file_unshare' file.id %}" class="btn btn-primary">{% trans 'Unshare' %}</a>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+    

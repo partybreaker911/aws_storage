@@ -96,49 +96,35 @@ class File(models.Model):
     def __str__(self) -> str:
         return f"{self.name}"
 
-    # @property
-    # def get_file_size(self):
-    #     return f"{file_size(self.file)}"
+    @property
+    def get_file_size(self):
+        return f"{file_size(self.file)}"
 
-    # def encrypt_and_sign(self):
-    #     key_pair = RSAKeyPair.objects.get(user=self.user)
-    #     public_key = key_pair.get_public_key()
 
-    #     with self.file.open("rb") as f:
-    #         file_data = f.read()
+class FileShare(models.Model):
+    id = models.UUIDField(
+        _("ID"), primary_key=True, default=uuid.uuid4, unique=True, editable=False
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="file_shares",
+        verbose_name=_("User"),
+    )
+    file = models.ForeignKey(
+        File,
+        on_delete=models.CASCADE,
+        related_name="file_shares",
+        verbose_name=_("File"),
+    )
+    timestamp = models.DateTimeField(_("Timestamp"), auto_now_add=True)
 
-    #     # Encrypt the file using the public key
-    #     encrypted_data = public_key.encrypt(
-    #         file_data,
-    #         padding.OAEP(
-    #             mgf=padding.MGF1(algorithm=hashes.SHA256()),
-    #             algorithm=hashes.SHA256(),
-    #             label=None,
-    #         ),
-    #     )
+    class Meta:
+        verbose_name = _("File share")
+        verbose_name_plural = _("File shares")
 
-    #     # Save the encrypted file data
-    #     encrypted_file_path = f"files/encrypted/{self.name}"
-    #     with open(encrypted_file_path, "wb") as f:
-    #         f.write(encrypted_data)
-
-    #     # Generate the signature for the encrypted file
-    #     private_key = key_pair.get_private_key()
-    #     signer = private_key.signer(padding.PSS(mgf=padding.MGF1(hashes.SHA256())))
-    #     signer.update(encrypted_data)
-    #     signature = signer.finalize()
-
-    #     # Save the file signature
-    #     FileSignature.objects.create(file=self, signature=signature)
-
-    #     return encrypted_file_path
-
-    # def save(self, *args, **kwargs):
-    #     is_new_file = not self.pk
-    #     super().save(*args, **kwargs)
-
-    #     if is_new_file:
-    #         self.encrypt_and_sign()
+    def __str__(self) -> str:
+        return self.file.name
 
 
 class FileSignature(models.Model):

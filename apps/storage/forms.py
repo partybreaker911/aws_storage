@@ -1,6 +1,10 @@
 from django import forms
+from django.contrib.auth import get_user_model
+from django.utils.translation import gettext_lazy as _
 
-from apps.storage.models import File
+from apps.storage.models import File, FileShare
+
+User = get_user_model()
 
 
 class FileUploadForm(forms.ModelForm):
@@ -31,3 +35,17 @@ class FileUploadForm(forms.ModelForm):
             instance.save()
 
         return instance
+
+
+class FileShareForm(forms.ModelForm):
+    user = forms.ModelChoiceField(
+        queryset=User.objects.all(),
+        widget=forms.Select(attrs={"class": "form-control"}),
+        label="User",
+    )
+
+    class Meta:
+        model = FileShare
+        fields = [
+            "user",
+        ]
