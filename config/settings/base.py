@@ -314,3 +314,4 @@ ACCOUNT_ADAPTER = "allauth_2fa.adapter.OTPAdapter"
 # SOCIALACCOUNT_ADAPTER = "commun_com_ua.users.adapters.SocialAccountAdapter"
 # https://django-allauth.readthedocs.io/en/latest/forms.html
 # SOCIALACCOUNT_FORMS = {"signup": "commun_com_ua.users.forms.UserSocialSignupForm"}
+TELEGRAM_BOT_TOKEN = env("TELEGRAM_BOT_TOKEN")
