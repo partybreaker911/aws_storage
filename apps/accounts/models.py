@@ -111,7 +111,7 @@ class RSAKeyPair(models.Model):
         return f"{self.id}"
 
     @property
-    def get_public_key(self) -> serialization.PublicKey:
+    def get_public_key(self) -> serialization:
         """
         Returns the public key of the current instance as a `serialization.PublicKey` object.
 
@@ -126,7 +126,7 @@ class RSAKeyPair(models.Model):
         )
 
     @property
-    def get_private_key(self) -> serialization.RSAPrivateKey:
+    def get_private_key(self) -> serialization:
         """
         Return the private key as a RSAPrivateKey object.
 
