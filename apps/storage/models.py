@@ -5,6 +5,13 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives import asymmetric
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import padding
+
+from apps.accounts.models import RSAKeyPair
+
 User = get_user_model()
 
 
@@ -89,9 +96,49 @@ class File(models.Model):
     def __str__(self) -> str:
         return f"{self.name}"
 
-    @property
-    def get_file_size(self):
-        return f"{file_size(self.file)}"
+    # @property
+    # def get_file_size(self):
+    #     return f"{file_size(self.file)}"
+
+    # def encrypt_and_sign(self):
+    #     key_pair = RSAKeyPair.objects.get(user=self.user)
+    #     public_key = key_pair.get_public_key()
+
+    #     with self.file.open("rb") as f:
+    #         file_data = f.read()
+
+    #     # Encrypt the file using the public key
+    #     encrypted_data = public_key.encrypt(
+    #         file_data,
+    #         padding.OAEP(
+    #             mgf=padding.MGF1(algorithm=hashes.SHA256()),
+    #             algorithm=hashes.SHA256(),
+    #             label=None,
+    #         ),
+    #     )
+
+    #     # Save the encrypted file data
+    #     encrypted_file_path = f"files/encrypted/{self.name}"
+    #     with open(encrypted_file_path, "wb") as f:
+    #         f.write(encrypted_data)
+
+    #     # Generate the signature for the encrypted file
+    #     private_key = key_pair.get_private_key()
+    #     signer = private_key.signer(padding.PSS(mgf=padding.MGF1(hashes.SHA256())))
+    #     signer.update(encrypted_data)
+    #     signature = signer.finalize()
+
+    #     # Save the file signature
+    #     FileSignature.objects.create(file=self, signature=signature)
+
+    #     return encrypted_file_path
+
+    # def save(self, *args, **kwargs):
+    #     is_new_file = not self.pk
+    #     super().save(*args, **kwargs)
+
+    #     if is_new_file:
+    #         self.encrypt_and_sign()
 
 
 class FileSignature(models.Model):
