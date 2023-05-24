@@ -1,6 +1,10 @@
 from celery import shared_task
 from django.core.mail import send_mail
 
+"""
+    TODO: Implement using template for email
+"""
+
 
 @shared_task
 def send_file_share_email(file_url: str, recipient_email: str) -> None:
