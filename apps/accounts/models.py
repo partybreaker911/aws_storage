@@ -5,6 +5,10 @@ from django.contrib.sessions.models import Session
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
 
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.backends import default_backend
+
+
 from phonenumber_field.modelfields import PhoneNumberField
 
 
@@ -105,6 +109,18 @@ class RSAKeyPair(models.Model):
 
     def __str__(self) -> str:
         return f"{self.id}"
+
+    @property
+    def get_public_key(self):
+        return serialization.load_pem_public_key(
+            self.public_key.encode(), backend=default_backend()
+        )
+
+    @property
+    def get_private_key(self):
+        return serialization.load_pem_private_key(
+            self.private_key.encode(), password=None, backend=default_backend()
+        )
 
 
 class UserSession(models.Model):

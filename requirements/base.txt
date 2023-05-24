@@ -29,5 +29,6 @@ django-ipware==5.0.0 # https://github.com/un33k/django-ipware
 # Django REST Framework
 # Django phone number extension
 phonenumbers==8.13.8
-phonenumbers==8.13.8
-cryptography==40.0.2
+rsa==4.9
+cryptography
+pycryptodome
