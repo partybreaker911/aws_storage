@@ -7,9 +7,25 @@ admin.site.register(Folder)
 
 class FileAdmin(admin.ModelAdmin):
     model = File
-    list_display = ["id", "name", "timestamp"]
+    list_display = [
+        "id",
+        "name",
+        "get_file_size",
+        "timestamp",
+    ]
 
 
 admin.site.register(File, FileAdmin)
-admin.site.register(FileShare)
+
+
+class FileShareAdmin(admin.ModelAdmin):
+    model = FileShare
+    list_display = [
+        "user",
+        "file",
+        "timestamp",
+    ]
+
+
+admin.site.register(FileShare, FileShareAdmin)
 admin.site.register(FileSignature)

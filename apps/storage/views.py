@@ -3,7 +3,7 @@ from django.db import models
 from django.db.models.query import QuerySet
 import rsa
 
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.shortcuts import render, redirect
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
@@ -11,8 +11,9 @@ from django.views.generic import View, CreateView, DeleteView, ListView, DetailV
 from django.http import HttpResponse, HttpRequest
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from apps.storage.models import Folder, File, FileSignature, FileShare
 from apps.accounts.models import RSAKeyPair
+from apps.storage.tasks import send_file_share_email
+from apps.storage.models import Folder, File, FileSignature, FileShare
 from apps.storage.forms import FileUploadForm, FileShareForm
 
 from apps.storage.services.files import FileUploadService
@@ -84,33 +85,21 @@ class FileShareView(LoginRequiredMixin, CreateView):
     form_class = FileShareForm
     template_name = "storage/file_share.html"
 
-    def form_valid(self, form: FileShareForm) -> HttpResponse:
-        """
-        Validates form data and returns an HTTP response if it's valid.
-
-        Args:
-            self: the instance of the class.
-            form: the form to validate.
-
-        Returns:
-            An HttpResponse object with the validated form data.
-        """
+    def form_valid(self, form):
         file = get_object_or_404(File, id=self.kwargs["pk"], user=self.request.user)
         form.instance.file = file
-        form.instance.user = form.cleaned_data["user"]
-        return super().form_valid(form)
+        form.instance.user = form.cleaned_data["email"]
+        response = super().form_valid(form)
 
-    def get_success_url(self) -> str:
-        """
-        Validates form data and returns an HTTP response if it's valid.
+        shared_user = form.cleaned_data["email"]
+        file_url = self.request.build_absolute_uri(
+            reverse("storage:file_detail", kwargs={"pk": file.id})
+        )
+        recepient_email = shared_user.email
+        send_file_share_email.delay(file_url, recepient_email)
+        return response
 
-        Args:
-            self: the instance of the class.
-            form: the form to validate.
-
-        Returns:
-            An HttpResponse object with the validated form data.
-        """
+    def get_success_url(self):
         return reverse_lazy("storage:file_detail", kwargs={"pk": self.kwargs["pk"]})
 
 
