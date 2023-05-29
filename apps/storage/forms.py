@@ -1,6 +1,11 @@
 from django import forms
+from django.contrib.auth import get_user_model
+from django.core.exceptions import ObjectDoesNotExist
+from django.utils.translation import gettext_lazy as _
 
-from apps.storage.models import File
+from apps.storage.models import File, FileShare
+
+User = get_user_model()
 
 
 class FileUploadForm(forms.ModelForm):
@@ -30,4 +35,29 @@ class FileUploadForm(forms.ModelForm):
         if commit:
             instance.save()
 
+        return instance
+
+
+class FileShareForm(forms.ModelForm):
+    email = forms.EmailField(
+        widget=forms.EmailInput(attrs={"class": "form-control"}), label="User Email"
+    )
+
+    class Meta:
+        model = FileShare
+        fields = ["email"]
+
+    def clean_email(self):
+        email = self.cleaned_data["email"]
+        try:
+            user = User.objects.get(email=email)
+        except ObjectDoesNotExist:
+            raise forms.ValidationError("User with this email does not exist.")
+        return user
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.user = self.cleaned_data["email"]
+        if commit:
+            instance.save()
         return instance

@@ -37,3 +37,14 @@ Rename .envs_example to .envs
       $ docker-compose -f local.yml run django python manage.py initadmin
 
 For convenience, you can keep your normal user logged in on Chrome and your superuser logged in on Firefox (or similar), so that you can see how the site behaves for both kinds of users.
+_____
+### Futures
+
+-    [ ] Adding master key generation for `cli` command so all keys that shares in project can be encrypted by master key
+-    [ ] All master key`s regenerate ones in 24h
+-    [ ] Encryption for all file`s that upload users
+-    [ ] User can select cloud provider as an `AWS S3` bucket as part of `cli` functionality
+-    [ ] when downloading files, the files will be packed into an archive. IDK what's gonna be the archive type
+-    [ ] Every this need to refactor as `API calls`
+-    [ ] All heavy loaded functionality associated with the operation of the application need to work as background tasks
+-    [ ] Setup CD\CI with tests

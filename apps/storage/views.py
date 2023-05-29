@@ -1,142 +1,147 @@
+from typing import Any
+from django.db import models
+from django.db.models.query import QuerySet
 import rsa
 
-from django.views.generic import View, CreateView
+from django.urls import reverse_lazy, reverse
 from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404
+from django.contrib.auth import get_user_model
+from django.views.generic import View, CreateView, DeleteView, ListView, DetailView
 from django.http import HttpResponse, HttpRequest
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from apps.storage.models import Folder, File, FileSignature
 from apps.accounts.models import RSAKeyPair
-from apps.storage.forms import FileUploadForm
+from apps.storage.tasks import send_file_share_email
+from apps.storage.models import Folder, File, FileSignature, FileShare
+from apps.storage.forms import FileUploadForm, FileShareForm
 
-# from apps.storage.services.files import FileUploadService
+from apps.storage.services.files import FileUploadService
 
-
-# class FileUploadView(LoginRequiredMixin, View):
-#     template_name = "storage/file_upload.html"
-
-#     def get(self, request: HttpRequest) -> HttpResponse:
-#         """Handles GET requests to the view.
-
-#         Args:
-#             request (HttpRequest): The HTTP request object.
-
-#         Returns:
-#             HttpResponse: The HTTP response object.
-#         """
-#         form = FileUploadForm()
-#         context = {
-#             "form": form,
-#         }
-#         return render(request, self.template_name, context)
-
-#     def post(self, request: HttpRequest) -> HttpResponse:
-#         """
-#         Handle HTTP POST requests.
-
-#         Args:
-#             request (HttpRequest): The HTTP request object.
-
-#         Returns:
-#             HttpResponse: The HTTP response object.
-
-#         """
-#         form = FileUploadForm(request.POST, request.FILES)
-#         if form.is_valid():
-#             file = form.cleaned_data["file"]
-#             name = file.name
-#             user = request.user
-
-#             file_obj = FileUploadService.upload_file(user=user, name=name, file=file)
-#             return redirect("dashboard:dashboard")
-#         return render(request, self.template_name)
+User = get_user_model()
 
 
-# class FileUploadView(CreateView):
-# template_name = "storage/file_upload.html"
-# form_class = FileUploadForm
-# success_url = "/"
-
-# def form_valid(self, form):
-#     # Get the uploaded file
-#     uploaded_file = form.cleaned_data["file"]
-
-#     # Retrieve the RSA key pair for the current user
-#     user = self.request.user
-#     rsa_key_pair = RSAKeyPair.objects.get(user=user)
-
-#     # Extract the public key from the stored key pair
-#     public_key = rsa.PublicKey.load_pkcs1_openssl_pem(
-#         rsa_key_pair.public_key.encode()
-#     )
-
-#     # Encrypt the uploaded file
-#     encrypted_file = rsa.encrypt(uploaded_file.read(), public_key)
-
-#     # Sign the encrypted file
-#     signature = rsa.sign(encrypted_file, rsa_key_pair.private_key, "SHA-256")
-
-#     # Save the encrypted file and signature in the database
-#     file_obj = File(user=user, name=uploaded_file.name, file=uploaded_file)
-#     file_obj.save()
-
-#     signature_obj = FileSignature(file=file_obj, signature=signature)
-#     signature_obj.save()
-
-#     return super().form_valid(form)
-
-
-from cryptography.hazmat.primitives.ciphers import (
-    Cipher,
-    algorithms,
-    modes,
-)
-from Crypto.Random import get_random_bytes
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import serialization, hashes
-from cryptography.hazmat.primitives.asymmetric import padding
-
-
-class FileUploadView(LoginRequiredMixin, CreateView):
+class FileUploadView(LoginRequiredMixin, View):
     template_name = "storage/file_upload.html"
-    form_class = FileUploadForm
-    success_url = "/"
+
+    def get(self, request: HttpRequest) -> HttpResponse:
+        """Handles GET requests to the view.
+
+        Args:
+            request (HttpRequest): The HTTP request object.
+
+        Returns:
+            HttpResponse: The HTTP response object.
+        """
+        form = FileUploadForm()
+        context = {
+            "form": form,
+        }
+        return render(request, self.template_name, context)
+
+    def post(self, request: HttpRequest) -> HttpResponse:
+        """
+        Handle HTTP POST requests.
+
+        Args:
+            request (HttpRequest): The HTTP request object.
+
+        Returns:
+            HttpResponse: The HTTP response object.
+
+        """
+        form = FileUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            file = form.cleaned_data["file"]
+            name = file.name
+            user = request.user
+
+            file_obj = FileUploadService.upload_file(user=user, name=name, file=file)
+            return redirect("dashboard:dashboard")
+        return render(request, self.template_name)
+
+
+class FileListView(LoginRequiredMixin, ListView):
+    model = File
+    template_name = "storage/file_list.html"
+    context_object_name = "files"
+    paginate_by = 10
+
+    def get_queryset(self) -> QuerySet[Any]:
+        return self.model.objects.filter(user=self.request.user)
+
+
+class FileDetailView(LoginRequiredMixin, DetailView):
+    model = File
+    template_name = "storage/file_detail.html"
+    context_object_name = "file"
+
+    def get_queryset(self) -> QuerySet[Any]:
+        return self.model.objects.filter(user=self.request.user)
+
+
+class FileShareView(LoginRequiredMixin, CreateView):
+    model = FileShare
+    form_class = FileShareForm
+    template_name = "storage/file_share.html"
 
     def form_valid(self, form):
-        # Get the uploaded file
-        uploaded_file = form.cleaned_data["file"]
+        file = get_object_or_404(File, id=self.kwargs["pk"], user=self.request.user)
+        form.instance.file = file
+        form.instance.user = form.cleaned_data["email"]
+        response = super().form_valid(form)
 
-        # Retrieve the RSA key pair for the current user
+        shared_user = form.cleaned_data["email"]
+        file_url = self.request.build_absolute_uri(
+            reverse("storage:file_detail", kwargs={"pk": file.id})
+        )
+        recepient_email = shared_user.email
+        send_file_share_email.delay(file_url, recepient_email)
+        return response
+
+    def get_success_url(self):
+        return reverse_lazy("storage:file_detail", kwargs={"pk": self.kwargs["pk"]})
+
+
+class FileUnshareView(LoginRequiredMixin, DeleteView):
+    model = FileShare
+    template_name = "storage/file_unshare.html"
+
+    def get_object(self, queryser=None) -> FileShare:
+        """
+        Retrieve a file shared by a user.
+
+        Args:
+            self (object): The object instance.
+            queryser (None): An optional queryset.
+
+        Returns:
+            FileShare: The shared file.
+        """
+        file: File = get_object_or_404(
+            File, id=self.kwargs["pk"], user=self.request.user
+        )
+        user: User = get_object_or_404(User, id=self.kwargs["user_id"])
+        return get_object_or_404(FileShare, file=file, user=user)
+
+    def get_success_url(self) -> str:
+        """
+        Get the success URL for the file detail view.
+
+        Args:
+            self: The instance of the view calling this function.
+
+        Returns:
+            A string representing the success URL.
+        """
+        return reverse_lazy("storage:file_detail", kwargs={"pk": self.kwargs["pk"]})
+
+
+class SharedFilesView(LoginRequiredMixin, ListView):
+    model = File
+    template_name = "storage/shared_files.html"
+    context_object_name = "shared_files"
+
+    def get_queryset(self) -> QuerySet[Any]:
         user = self.request.user
-        rsa_key_pair = RSAKeyPair.objects.get(user=user)
-
-        # Load the private key
-        private_key = serialization.load_pem_private_key(
-            rsa_key_pair.private_key.encode(), password=None, backend=default_backend()
-        )
-
-        # Sign the uploaded file
-        file_data = uploaded_file.read()
-        signature = private_key.sign(
-            file_data,
-            padding.PSS(
-                mgf=padding.MGF1(hashes.SHA256()), salt_length=padding.PSS.MAX_LENGTH
-            ),
-            hashes.SHA256(),
-        )
-
-        # Create the file object and set the user and other fields
-        file_obj = File(
-            user=self.request.user, name=uploaded_file.name, file=uploaded_file
-        )
-
-        # Save the file object
-        file_obj.save()
-
-        # Set the signature object for the file
-        signature_obj = FileSignature.objects.create(file=file_obj, signature=signature)
-
-        # Save the signature object
-        signature_obj.save()
-
-        return super().form_valid(form)
+        return File.objects.filter(files_shared__user=user)
