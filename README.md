@@ -37,7 +37,7 @@ Rename .envs_example to .envs
       $ docker-compose -f local.yml run django python manage.py initadmin
 
 For convenience, you can keep your normal user logged in on Chrome and your superuser logged in on Firefox (or similar), so that you can see how the site behaves for both kinds of users.
-
+_____
 ### Futures
 
 -    [ ] Adding master key generation for `cli` command so all keys that shares in project can be encrypted by master key
