@@ -135,3 +135,13 @@ class FileUnshareView(LoginRequiredMixin, DeleteView):
             A string representing the success URL.
         """
         return reverse_lazy("storage:file_detail", kwargs={"pk": self.kwargs["pk"]})
+
+
+class SharedFilesView(LoginRequiredMixin, ListView):
+    model = File
+    template_name = "storage/shared_files.html"
+    context_object_name = "shared_files"
+
+    def get_queryset(self) -> QuerySet[Any]:
+        user = self.request.user
+        return File.objects.filter(files_shared__user=user)

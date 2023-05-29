@@ -12,4 +12,5 @@ urlpatterns = [
     path(
         "file/<uuid:pk>/unshare", views.FileUnshareView.as_view(), name="file_unshare"
     ),
+    path("files/shared/", views.SharedFilesView.as_view(), name="file_shared"),
 ]
